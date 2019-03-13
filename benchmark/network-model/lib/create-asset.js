@@ -1,0 +1,70 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+'use strict';
+
+
+// Investigate submitTransaction() using network model to create an asset of specific size in the registry
+// - label: create-asset-100
+//     chaincodeId: fixed-asset
+//     txNumber:
+//     - 1000
+//     rateControl:
+//     - type: fixed-rate
+//       opts:
+//         tps: 50
+//     arguments:
+//       bytesize: 100
+//     callback: benchmark/network-model/lib/create-asset.js
+
+module.exports.info  = 'Creating Asset in Registry';
+
+const chaincodeID = 'fixed-asset';
+// const appmetrics = require('appmetrics');
+// require('appmetrics-dash').monitor({appmetrics: appmetrics});
+// appmetrics.enable('profiling');
+const bytes = (s) => {
+    return ~-encodeURI(s).split(/%..|./).length;
+};
+
+let txIndex = 0;
+let clientIdx;
+let asset = {docType: chaincodeID, content: ''};
+let bc, contx, bytesize;
+
+module.exports.init = async function(blockchain, context, args) {
+    bc = blockchain;
+    contx = context;
+    clientIdx = context.clientIdx;
+    bytesize = args.bytesize;
+
+    asset.creator = 'client' + clientIdx;
+    asset.bytesize = bytesize;
+
+    const rand = 'random';
+    let idx = 0;
+    while (bytes(JSON.stringify(asset)) < bytesize) {
+        const letter = rand.charAt(idx);
+        idx = idx >= rand.length ? 0 : idx+1;
+        asset.content = asset.content + letter;
+    }
+
+    const contract = await context.network.getContract(chaincodeID);
+    context.contract = contract;
+    contx = context;
+};
+
+module.exports.run = function() {
+    asset.uuid = 'client' + clientIdx + '_' + bytesize + '_' + txIndex;
+    txIndex++;
+    const myArgs = {
+        verb: 'createAsset',
+        body: JSON.stringify(asset)
+    };
+    return bc.invokeSmartContract(contx, chaincodeID, 'v1', myArgs);
+};
+
+module.exports.end = function() {
+    return Promise.resolve();
+};

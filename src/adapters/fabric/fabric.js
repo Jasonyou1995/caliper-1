@@ -86,7 +86,6 @@ class Fabric extends BlockchainInterface{
 
         let fabricSettings  = require(this.configPath);
         let context = fabricSettings.fabric.context;
-
         // Either using network mode or baseAPI mode
         if (fabricSettings.info.contractInvoke) {
             // Create in memory wallet using org0
@@ -97,7 +96,8 @@ class Fabric extends BlockchainInterface{
             const opts = {
                 wallet: wallet,
                 identity: userId,
-                discovery: {enabled: false}
+                discovery: {enabled: false},
+                eventHandlerOptions: {commitTimeout: 60000}
             };
 
             // clientTlsIdentity is conditional on config
@@ -197,17 +197,17 @@ class Fabric extends BlockchainInterface{
      * @param {string} contractVer The version of the chaincode.
      * @param {string} arg The argument to pass to the chaincode query.
      * @param {string} [fcn=query] The chaincode query function name.
-     * @param {Boolean} consensus boolean flag to indicate if the query is to be recorded ont the ledger or not
      * @return {Promise<object>} The promise for the result of the execution.
      */
-    queryState(context, contractID, contractVer, arg, fcn = 'query', consensus) {
-
+    queryState(context, contractID, contractVer, arg, fcn = 'query') {
         // Branch on interaction type
         if(context.gateway) {
+            const consensus = arg[0];
+            const args = arg.slice(1);
             if (consensus) {
-                return e2eUtils.submitTransaction(context, arg);
+                return e2eUtils.submitTransaction(context, args);
             } else {
-                return e2eUtils.executeTransaction(context, arg);
+                return e2eUtils.evaluateTransaction(context, args);
             }
         } else {
             return e2eUtils.querybycontext(context, contractID, contractVer, arg.toString(), fcn);

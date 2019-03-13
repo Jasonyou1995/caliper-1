@@ -20,7 +20,6 @@ async function main() {
         .option('-c, --config <file>', 'config file of the benchmark')
         .option('-n, --network <file>', 'config file of the blockchain system under test')
         .parse(process.argv);
-
     let logger = Util.getLogger('scripts/main.js');
     let absConfigFile;
     if(typeof program.config === 'undefined') {

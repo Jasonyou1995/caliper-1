@@ -18,6 +18,8 @@
 const commUtils = require('../../comm/util');
 const commLogger = commUtils.getLogger('e2eUtils.js');
 const TxStatus  = require('../../comm/transaction');
+const TxErrorEnum = require('./constant.js').TxErrorEnum;
+const TxErrorIndex = require('./constant.js').TxErrorIndex;
 
 const FabricCAServices = require('fabric-ca-client');
 const Client = require('fabric-client');
@@ -837,9 +839,6 @@ async function writeToFile(name){
 
 module.exports.writeToFile = writeToFile;
 
-const TxErrorEnum = require('./constant.js').TxErrorEnum;
-const TxErrorIndex = require('./constant.js').TxErrorIndex;
-
 
 /**
  * Submit a transaction to the orderer.
@@ -1229,8 +1228,7 @@ async function retrieveGateway(ccpPath, opts) {
  * @param {string[]} args The arguments to pass to the chaincode.
  * @return {Promise<TxStatus>} The result and stats of the transaction invocation.
  */
-async function submitTransaction(context, args){
-    const TxErrorEnum = require('./constant.js').TxErrorEnum;
+async function submitTransaction(context, args) {
     const txIdObject = context.gateway.client.newTransactionID();
     const txId = txIdObject.getTransactionID().toString();
 
@@ -1264,7 +1262,6 @@ async function submitTransaction(context, args){
  * @return {Promise<TxStatus>} The result and stats of the transaction invocation.
  */
 async function evaluateTransaction(context, args){
-    const TxErrorEnum = require('./constant.js').TxErrorEnum;
     const txIdObject = context.gateway.client.newTransactionID();
     const txId = txIdObject.getTransactionID().toString();
 

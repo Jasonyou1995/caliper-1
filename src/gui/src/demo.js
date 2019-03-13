@@ -126,7 +126,7 @@ function demoRefreshData(updates) {
         logger.info('[Transaction Info] - Submitted: ' + demoData.summary.txSub
         + ' Succ: ' + demoData.summary.txSucc
         + ' Fail:' +  demoData.summary.txFail
-        + ' Unfinished:' + (demoData.summary.txSub - demoData.summary.txSucc - demoData.summary.txFail));
+        + ' Unfinished:' + (demoData.summary.txSub - (demoData.summary.txSucc + demoData.summary.txFail)));
    // }
 
     var fs = require('fs');

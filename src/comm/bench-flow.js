@@ -72,7 +72,6 @@ function createReport() {
             report.addSUTInfo(key, sut.info[key]);
         }
     }
-
     report.addLabelDescriptionMap(config.test.rounds);
 }
 
@@ -91,7 +90,7 @@ function printTable(value) {
  */
 function getResultTitle() {
     // temporarily remove percentile return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', '75%ile Latency', 'Throughput'];
-    return ['Name', 'Succ', 'Fail', 'Send Rate', 'Max Latency', 'Min Latency', 'Avg Latency', 'Throughput'];
+    return ['Name', 'Succ', 'Fail', 'Send Rate (TPS)', 'Max Latency (s)', 'Min Latency (s)', 'Avg Latency (s)', 'Throughput (TPS)'];
 }
 
 /**
@@ -106,10 +105,10 @@ function getResultValue(r) {
         row.push(r.label);
         row.push(r.succ);
         row.push(r.fail);
-        (r.create.max === r.create.min) ? row.push((r.succ + r.fail) + ' tps') : row.push(((r.succ + r.fail) / (r.create.max - r.create.min)).toFixed(1) + ' tps');
-        row.push(r.delay.max.toFixed(2) + ' s');
-        row.push(r.delay.min.toFixed(2) + ' s');
-        row.push((r.delay.sum / r.succ).toFixed(2) + ' s');
+        (r.create.max === r.create.min) ? row.push((r.succ + r.fail)) : row.push(((r.succ + r.fail) / (r.create.max - r.create.min)).toFixed(1));
+        row.push(r.delay.max.toFixed(2));
+        row.push(r.delay.min.toFixed(2));
+        row.push((r.delay.sum / r.succ).toFixed(2));
         // temporarily remove percentile
         /*if(r.delay.detail.length === 0) {
             row.push('N/A');
@@ -121,7 +120,7 @@ function getResultValue(r) {
             row.push(r.delay.detail[Math.floor(r.delay.detail.length * 0.75)].toFixed(2) + ' s');
         }*/
 
-        (r.final.max === r.create.min) ? row.push(r.succ + ' tps') : row.push(((r.succ / (r.final.max - r.create.min)).toFixed(1)) + ' tps');
+        (r.final.max === r.create.min) ? row.push(r.succ) : row.push(((r.succ / (r.final.max - r.create.min)).toFixed(1)));
         logger.debug('r.create.max: '+ r.create.max + ' r.create.min: ' + r.create.min + ' r.final.max: ' + r.final.max + ' r.final.min: '+ r.final.min);
     }
     catch (err) {

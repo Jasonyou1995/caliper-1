@@ -8,6 +8,7 @@
   },
   "fabric": {
     "cryptodir": "network/fabric-v1.4/config/crypto-config",
+    "ccp": "network/fabric-v1.4/2org1peercouchdb/ccp.json",
     "network": {
       "orderer": {
         "url": "grpc://localhost:7050",
@@ -20,6 +21,11 @@
         "name": "peerOrg1",
         "mspid": "Org1MSP",
         "msp": "network/fabric-v1.4/config/crypto-config/peerOrganizations/org1.example.com/msp/",
+        "user": {
+          "name": "Admin@org1.example.com",
+          "key": "network/fabric-v1.4/config/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/key.pem",
+          "cert": "network/fabric-v1.4/config/crypto-config/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem"
+        },
         "ca": {
           "url": "http://localhost:7054",
           "name": "ca.org1.example.com"
@@ -56,8 +62,7 @@
       }
     ],
     "chaincodes": [
-      {"id": "marbles", "path": "src/contract/fabric/marbles/node", "language":"node", "version": "v1", "channel": "mychannel", "metadataPath": "src/contract/fabric/marbles/node/metadata"},
-      {"id": "simple", "path": "src/contract/fabric/simple/node", "language":"node", "version": "v0", "channel": "mychannel"}
+      {"id": "fixed-asset", "path": "src/contract/network-model/fixed-asset-size/node", "language":"node", "version": "v1", "channel": "mychannel", "metadataPath": "src/contract/network-model/fixed-asset-size/node/metadata"}
     ],
     "endorsement-policy": {
       "identities": [
@@ -83,15 +88,53 @@
       "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}]}
     },
     "context": {
-      "init": "mychannel",
-      "open": "mychannel",
-      "query": "mychannel"
+      "null-response-evaluate": "mychannel",
+      "null-response-submit": "mychannel",
+      "create-asset-5":  "mychannel",
+      "create-asset-500":  "mychannel",
+      "create-asset-1000":  "mychannel",
+      "create-asset-2000":  "mychannel",
+      "create-asset-4000":  "mychannel",
+      "create-asset-8000":  "mychannel",
+      "create-asset-16000":  "mychannel",
+      "create-asset-32000":  "mychannel",
+      "get-asset-evaluate-0":  "mychannel",
+      "get-asset-evaluate-500":  "mychannel",
+      "get-asset-evaluate-1000":  "mychannel",
+      "get-asset-evaluate-2000":  "mychannel",
+      "get-asset-evaluate-4000":  "mychannel",
+      "get-asset-evaluate-8000":  "mychannel",
+      "get-asset-evaluate-16000":  "mychannel",
+      "get-asset-evaluate-32000":  "mychannel",
+      "rich-query-evaluate-0": "mychannel",
+      "rich-query-evaluate-500": "mychannel",
+      "rich-query-evaluate-1000": "mychannel",
+      "rich-query-evaluate-2000": "mychannel",
+      "rich-query-evaluate-4000": "mychannel",
+      "rich-query-evaluate-8000": "mychannel",
+      "rich-query-evaluate-16000": "mychannel",
+      "rich-query-evaluate-32000": "mychannel",
+      "rich-query-ordered-0": "mychannel",
+      "rich-query-ordered-1000": "mychannel",
+      "range-query-evaluate-0":  "mychannel",
+      "range-query-evaluate-500":  "mychannel",
+      "range-query-evaluate-1000":  "mychannel",
+      "range-query-evaluate-2000":  "mychannel",
+      "range-query-evaluate-4000":  "mychannel",
+      "range-query-evaluate-8000":  "mychannel",
+      "range-query-evaluate-16000":  "mychannel",
+      "range-query-evaluate-32000":  "mychannel",
+      "range-query-ordered-0": "mychannel",
+      "range-query-ordered-1000": "mychannel"
     }
   },
   "info" : {
     "Version": "1.4.0",
     "Size": "2 Orgs with 1 Peer",
     "Orderer": "Solo",
-    "Distribution": "Single Host"
+    "Distribution": "Single Host",
+    "Endorsement policy": "Signed by a member from each of the peer organizations",
+    "Test client threads": "4",
+    "contractInvoke": true
   }
 }

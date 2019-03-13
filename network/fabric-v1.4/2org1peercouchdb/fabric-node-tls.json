@@ -83,9 +83,9 @@
       "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}]}
     },
     "context": {
-      "init": "mychannel",
-      "open": "mychannel",
-      "query": "mychannel"
+      "init": { "channel" : "mychannel", "chaincodeId" : "marbles"},
+      "open": { "channel" : "mychannel", "chaincodeId" : "marbles"},
+      "query": { "channel" : "mychannel", "chaincodeId" : "marbles"}
     }
   },
   "info" : {
