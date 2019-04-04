@@ -29,7 +29,7 @@ services:
     container_name: orderer.example.com
     image: hyperledger/fabric-orderer:1.4.0
     environment:
-      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LOGLEVEL=warning
       - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
       - ORDERER_GENERAL_GENESISMETHOD=file
       - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/orgs.genesis.block
@@ -47,8 +47,9 @@ services:
     container_name: peer0.org1.example.com
     image: hyperledger/fabric-peer:1.4.0
     environment:
-      - CORE_LOGGING_PEER=debug
-      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_PEER=warning
+      - ORE_CHAINCODE_LOGGING_LEVEL=warning
+      - CORE_CHAINCODE_EXECUTETIMEOUT=120000
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.org1.example.com
       - CORE_PEER_ENDORSER_ENABLED=true
@@ -87,8 +88,9 @@ services:
     container_name: peer0.org2.example.com
     image: hyperledger/fabric-peer:1.4.0
     environment:
-      - CORE_LOGGING_PEER=debug
-      - CORE_CHAINCODE_LOGGING_LEVEL=DEBUG
+      - CORE_LOGGING_PEER=warning
+      - ORE_CHAINCODE_LOGGING_LEVEL=warning=warning
+      - CORE_CHAINCODE_EXECUTETIMEOUT=120000
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - CORE_PEER_ID=peer0.org2.example.com
       - CORE_PEER_ENDORSER_ENABLED=true

@@ -43,7 +43,7 @@ async function run(config_path) {
         commLogger.info('Sleeping 5s...');
         await commUtils.sleep(5000);
     } catch (err) {
-        commLogger.error(`Failed to instantiate chaincodes: ${(err.stack ? err.stack : err)}`);
+        commLogger.error(`Failed to instantiate chaincodes: ${(err && err.stack ? err.stack : err)}`);
         throw err;
     }
 }

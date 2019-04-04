@@ -1,53 +1,37 @@
 ---
 test:
-  name: fixed-asset-range-query-ramp-couchDB
+  name: fixed-asset-rich-query-asset-ramp-couchDB
   description: This is a duration based benchmark targetting a Hyperledger Fabric network with a CouchDB world state database using the `fixed-asset` NodeJS chaincode contract that is interacted with via 
-    a Fabric-SDK-Node Gateway. Each test round flexes the 'pageinatedRichQuery' chaincode method, and includes a null-operation to act as a performance baseline. Successive rounds create and query assets of larger bytesize.
+    a Fabric-SDK-Node Gateway. Each test round invokes the 'paginatedRichQuery' chaincode method. Successive rounds create and query assets of larger bytesize.
   clients:
     type: local
-    number: 1
+    number: 4
   rounds:
-  - label: rich-query-evaluate-0
-    description: Test a evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches no assets in the world state database. This test includes involvement of the orderer, and appending to the ledger.
+  - label: rich-query-evaluate-100
+    description: Test a evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`.  This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 100 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 5,
+        unfinished_per_client: 15
     arguments:
-      bytesize: 1000
+      create_sizes: [100,1000,2000,4000,8000,16000,32000,64000]
+      assets: 200
+      bytesize: 100
       pagesize: '10'
-      nosetup: true
-      nomatch: true
-      consensus: false
-    callback: benchmark/network-model/lib/rich-query-asset.js
-  - label: rich-query-evaluate-500
-    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 500 bytes.
-    chaincodeId: fixed-asset
-    txDuration:
-    - 120
-    rateControl:
-    - type: fixed-backlog
-      opts:
-        unfinished_per_client: 10
-    arguments:
-      create_sizes: [500,1000,2000,4000,8000,16000,32000]
-      bytesize: 500
-      pagesize: '10'
-      assets: 1000
       consensus: false
     callback: benchmark/network-model/lib/rich-query-asset.js
   - label: rich-query-evaluate-1000
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 1000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       pagesize: '10'
@@ -58,11 +42,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 2000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 2000
       pagesize: '10'
@@ -73,11 +57,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 4000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 4000
       pagesize: '10'
@@ -88,11 +72,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 8000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 8000
       pagesize: '10'
@@ -103,11 +87,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 16000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 16000
       pagesize: '10'
@@ -118,13 +102,28 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 32000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 10
+        unfinished_per_client: 15
     arguments:
       bytesize: 32000
+      pagesize: '10'
+      nosetup: true
+      consensus: false
+    callback: benchmark/network-model/lib/rich-query-asset.js
+  - label: rich-query-evaluate-64000
+    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRichQuery`. This method performs a paginated rich query, with a passed pagesize of 10 and query string that matches all assets created by the calling client. Each returned asset is of size 64000 bytes.
+    chaincodeId: fixed-asset
+    txDuration:
+    - 300
+    rateControl:
+    - type: fixed-backlog
+      opts:
+        unfinished_per_client: 15
+    arguments:
+      bytesize: 64000
       pagesize: '10'
       nosetup: true
       consensus: false

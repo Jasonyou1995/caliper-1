@@ -18,8 +18,9 @@
 const commUtils = require('../../comm/util');
 const commLogger = commUtils.getLogger('e2eUtils.js');
 const TxStatus  = require('../../comm/transaction');
-const TxErrorEnum = require('./constant.js').TxErrorEnum;
-const TxErrorIndex = require('./constant.js').TxErrorIndex;
+const constants = require('./constant');
+const TxErrorEnum = constants.TxErrorEnum;
+const TxErrorIndex = constants.TxErrorIndex;
 
 const FabricCAServices = require('fabric-ca-client');
 const Client = require('fabric-client');
@@ -120,7 +121,7 @@ module.exports.readFromFile = readFromFile;
  * @async
  */
 async function installChaincode(org, chaincode) {
-    Client.setConfigSetting('request-timeout', 60000);
+    Client.setConfigSetting('request-timeout', constants.DEFAULT_TIMEOUT);
     const channel_name = chaincode.channel;
 
     const client = new Client();
@@ -273,7 +274,7 @@ function buildChaincodeProposal(client, chaincode, upgrade, transientMap, endors
  * @async
  */
 async function instantiate(chaincode, endorsement_policy, upgrade){
-    Client.setConfigSetting('request-timeout', 600000);
+    Client.setConfigSetting('request-timeout', constants.LARGE_TIMEOUT);
 
     let channel = testUtil.getChannel(chaincode.channel);
     if(channel === null) {
@@ -401,7 +402,7 @@ async function instantiate(chaincode, endorsement_policy, upgrade){
     eventPromises.push(channel.sendTransaction(request));
     eventhubs.forEach((eh) => {
         let txPromise = new Promise((resolve, reject) => {
-            let handle = setTimeout(reject, 300000);
+            let handle = setTimeout(reject, constants.LARGE_TIMEOUT);
 
             eh.registerTxEvent(deployId.toString(), (tx, code) => {
                 commLogger.info('The chaincode ' + type + ' transaction has been committed on peer '+ eh.getPeerAddr());
@@ -443,7 +444,7 @@ async function instantiate(chaincode, endorsement_policy, upgrade){
  */
 async function instantiateLegacy(chaincode, endorsement_policy, upgrade){
 
-    Client.setConfigSetting('request-timeout', 600000);
+    Client.setConfigSetting('request-timeout', constants.DEFAULT_TIMEOUT);
 
     let channel = testUtil.getChannel(chaincode.channel);
     if(channel === null) {
@@ -592,7 +593,7 @@ async function instantiateLegacy(chaincode, endorsement_policy, upgrade){
         const eventPromises = [];
         eventhubs.forEach((eh) => {
             let txPromise = new Promise((resolve, reject) => {
-                let handle = setTimeout(reject, 300000);
+                let handle = setTimeout(reject, constants.LARGE_TIMEOUT);
 
                 eh.registerTxEvent(deployId.toString(), (tx, code) => {
                     clearTimeout(handle);
@@ -679,7 +680,7 @@ function getOrgPeers(orgName) {
 async function getcontext(channelConfig, clientIdx, txModeFile) {
     clientIndex = clientIdx;
     txFile = txModeFile;
-    Client.setConfigSetting('request-timeout', 120000);
+    Client.setConfigSetting('request-timeout', constants.DEFAULT_TIMEOUT);
     const channel_name = channelConfig.name;
     // var userOrg = channelConfig.organizations[0];
     // choose a random org to use, for load balancing
@@ -754,8 +755,8 @@ async function getcontext(channelConfig, clientIdx, txModeFile) {
                     pem: Buffer.from(data).toString(),
                     'ssl-target-name-override': peerInfo['server-hostname'],
                     //'request-timeout': 120000
-                    'grpc.keepalive_timeout_ms' : 3000, // time to respond to the ping, 3 seconds
-                    'grpc.keepalive_time_ms' : 360000   // time to wait for ping response, 6 minutes
+                    'grpc.keepalive_timeout_ms' : constants.SHORT_TIMEOUT, // time to respond to the ping, 3 seconds
+                    'grpc.keepalive_time_ms' : constants.LARGE_TIMEOUT   // time to wait for ping response, 6 minutes
                     // 'grpc.http2.keepalive_time' : 15
                 }
             );
@@ -866,7 +867,7 @@ async function sendTransaction(context, signedTransaction, invokeStatus, startTi
         eventHubs.forEach((eh) => {
             eventPromises.push(new Promise((resolve, reject) => {
                 //let handle = setTimeout(() => reject(new Error('Timeout')), newTimeout);
-                let handle = setTimeout(() => reject(new Error('Timeout')), 100000);
+                let handle = setTimeout(() => reject(new Error('Timeout')), constants.DEFAULT_TIMEOUT);
                 eh.registerTxEvent(txId,
                     (tx, code) => {
                         clearTimeout(handle);

@@ -8,7 +8,7 @@
 // Investigate a paginated rich query that may or may not result in ledger appeding via orderer. Assets are created in the init phase
 // with a byte size that is specified as in input argument. Pagesize and the number of existing test assets are also cofigurable. The argument
 // "nosetup" and "consensus" are optional items that are default false. Resulting mago query is that whch targets assets created by the same client
-// - label: query-asset-100
+// - label: mixed-rich-query-asset-100
 //     chaincodeId: fixed-asset
 //     txNumber:
 //     - 1000
@@ -17,20 +17,20 @@
 //       opts:
 //         tps: 50
 //     arguments:
-//       bytesize: 100
-//       pagesize: 10
+//       create_sizes: [100, 500]
+//       pagesize: 100
 //       assets: 5000
 //       nosetup: true
-//     callback: benchmark/network-model/lib/rich-query-asset.js
+//     callback: benchmark/network-model/lib/mixed-rich-query-asset.js
 
 
-module.exports.info  = 'Paginated Rich Querying Assets of fixed size.';
+module.exports.info  = 'Paginated Rich Querying Assets of mixed size.';
 
 const helper = require('./helper');
 
 const chaincodeID = 'fixed-asset';
 let clientIdx, pagesize, mangoQuery, consensus;
-let bc, contx, bytesize, nomatch;
+let bc, contx, bytesize;
 
 module.exports.init = async function(blockchain, context, args) {
     bc = blockchain;
@@ -41,11 +41,10 @@ module.exports.init = async function(blockchain, context, args) {
     context.contract = contract;
     contx = context;
 
-    bytesize = args.bytesize;
+    bytesize = args.create_sizes.length[Math.floor(Math.random() * Math.floor(args.create_sizes.length))];
     pagesize = args.pagesize;
 
     consensus = args.consensus ? (args.consensus === 'true' || args.consensus === true) : false;
-    nomatch = args.nomatch ?  (args.nomatch === 'true' || args.nomatch === true): false;
     const nosetup = args.nosetup ? (args.nosetup === 'true' || args.nosetup === true) : false;
 
     console.log('   -> Rich query test configured with consensus flag set to ', consensus.toString());
@@ -54,7 +53,7 @@ module.exports.init = async function(blockchain, context, args) {
     mangoQuery = {
         'selector': {
             'docType': chaincodeID,
-            'creator': nomatch ? 'client_nomatch' : 'client' + clientIdx,
+            'creator': 'client' + clientIdx,
             'bytesize': bytesize
         }
     };
@@ -63,7 +62,7 @@ module.exports.init = async function(blockchain, context, args) {
         console.log('   -> Skipping asset creation stage');
     } else {
         console.log('   -> Entering asset creation stage');
-        await helper.addBatchAssets(contx, clientIdx, args);
+        await helper.addMixedBatchAssets(contx, clientIdx, args);
         console.log('   -> Test asset creation complete');
     }
 

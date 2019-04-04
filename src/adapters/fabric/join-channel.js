@@ -21,6 +21,7 @@ const e2eUtils = require('./e2eUtils.js');
 const testUtil = require('./util.js');
 const commUtils = require('../../comm/util');
 const commlogger = commUtils.getLogger('join-channel.js');
+const constants = require('./constant');
 
 /**
  * Join the peers of the given organization to the given channel.
@@ -99,7 +100,7 @@ async function joinChannel(org, channelName, orgs) {
             txId : tx_id
         };
 
-        const results = await channel.joinChannel(request, 130000);
+        const results = await channel.joinChannel(request, constants.DEFAULT_TIMEOUT);
 
         if(results[0] && results[0].response && results[0].response.status === 200) {
             commlogger.info(`Successfully joined ${orgName}'s peers to ${channelName}`);

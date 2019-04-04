@@ -3,7 +3,17 @@
 	"description":"The network to be in for test mastery",
 	"version":"1.0",
 	"client":{
-	  "organization":"Org1",
+		"organization":"Org1",
+		"connection": {
+			"timeout": {
+					"peer": {
+							"endorser": "6000",
+							"eventHub": "6000",
+							"eventReg": "6000"
+					},
+					"orderer": "6000"
+			}
+	  },
 	  "credentialStore":{
 		"path":"/tmp/hfc-kvs",
 		"cryptoStore":{
@@ -57,7 +67,8 @@
 	  "orderer.example.com":{
 		"url":"grpc://localhost:7050",
 		"grpcOptions":{
-		  "ssl-target-name-override":"orderer.example.com"
+			"ssl-target-name-override":"orderer.example.com",
+			"request-timeout": 1200000
 		},
 		"tlsCACerts":{
 		  "path":"network/fabric-v1.4/config/crypto-config/ordererOrganizations/example.com/orderers/orderer.example.com/tls/ca.crt"
@@ -68,7 +79,8 @@
 	  "peer0.org1.example.com":{
 		"url":"grpc://localhost:7051",
 		"grpcOptions":{
-		  "ssl-target-name-override":"peer0.org1.example.com"
+			"ssl-target-name-override":"peer0.org1.example.com",
+			"request-timeout": 1200000
 		},
 		"tlsCACerts":{
 		  "path":"network/fabric-v1.4/config/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt"
@@ -77,7 +89,8 @@
 	  "peer0.org2.example.com":{
 		"url":"grpc://localhost:8051",
 		"grpcOptions":{
-		  "ssl-target-name-override":"peer0.org2.example.com"
+			"ssl-target-name-override":"peer0.org2.example.com",
+			"request-timeout": 1200000
 		},
 		"tlsCACerts":{
 		  "path":"network/fabric-v1.4/config/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt"

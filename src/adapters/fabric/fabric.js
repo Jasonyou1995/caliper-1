@@ -18,7 +18,7 @@ const BlockchainInterface = require('../../comm/blockchain-interface.js');
 const commUtils = require('../../comm/util');
 const commLogger = commUtils.getLogger('fabric.js');
 const TxStatus = require('../../comm/transaction');
-
+const constants = require('./constant');
 /**
  * Implements {BlockchainInterface} for a Fabric backend.
  */
@@ -56,7 +56,7 @@ class Fabric extends BlockchainInterface{
             await impl_install.run(this.configPath);
             await impl_instantiate.run(this.configPath);
         } catch (err) {
-            commLogger.error(`Fabric chaincode install failed: ${(err.stack ? err.stack : err)}`);
+            commLogger.error(`Fabric chaincode install/instantiate failed: ${(err.stack ? err.stack : err)}`);
             throw err;
         }
     }
@@ -97,7 +97,7 @@ class Fabric extends BlockchainInterface{
                 wallet: wallet,
                 identity: userId,
                 discovery: {enabled: false},
-                eventHandlerOptions: {commitTimeout: 60000}
+                eventHandlerOptions: {commitTimeout: constants.DEFAULT_TIMEOUT}
             };
 
             // clientTlsIdentity is conditional on config

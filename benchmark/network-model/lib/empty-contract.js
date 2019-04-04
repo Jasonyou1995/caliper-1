@@ -35,7 +35,7 @@ module.exports.init = async function(blockchain, context, args) {
 module.exports.run = function() {
 
     // Create argument array [consensus(boolean), functionName(String), otherArgs(String)]
-    const myArgs = [consensus, 'nullResponse'];
+    const myArgs = [consensus, 'emptyContract'];
     return bc.queryState(contx, chaincodeID, 'v1', myArgs);
 
 };

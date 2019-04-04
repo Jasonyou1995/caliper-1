@@ -20,6 +20,11 @@ const path = require('path');
 
 const tempdir = path.join(os.homedir(), 'tmp/hfc');
 
+const SHORT_TIMEOUT = 3000;
+const DEFAULT_TIMEOUT = 120000;
+const MEDIUM_TIMEOUT = 360000;
+const LARGE_TIMEOUT = 600000;
+
 const TxErrorEnum = {
     NoError: 0,
     ProposalResponseError: 1,
@@ -42,5 +47,9 @@ const TxErrorIndex = {
 module.exports = {
     tempdir: tempdir,
     TxErrorIndex: TxErrorIndex,
-    TxErrorEnum: TxErrorEnum
+    TxErrorEnum: TxErrorEnum,
+    DEFAULT_TIMEOUT: DEFAULT_TIMEOUT,
+    SHORT_TIMEOUT: SHORT_TIMEOUT,
+    MEDIUM_TIMEOUT: MEDIUM_TIMEOUT,
+    LARGE_TIMEOUT: LARGE_TIMEOUT
 };

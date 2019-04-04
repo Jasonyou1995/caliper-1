@@ -4,10 +4,12 @@
 
 'use strict';
 
+const helper = require('./helper');
 
-// Investigate a 'get' that may or may not result in ledger appeding via orderer. Assets are created in the init phase
-// with a byte size that is specified as in input argument. The arguments "nosetup" and "consensus" are optional items that are default false.
-// - label: get-asset-100
+// Investigate a paginated range query that may or may not result in ledger appeding via orderer. Assets are created in the init phase
+// with a byte size that is specified as in input argument. Pagesize and the number of existing test assets, as well as the range and offset, are also cofigurable. The arguments
+// "nosetup" and "consensus" are optional items that are default false.
+// - label: mixed-range-query-asset-100
 //     chaincodeId: fixed-asset
 //     txNumber:
 //     - 1000
@@ -16,19 +18,21 @@
 //       opts:
 //         tps: 50
 //     arguments:
-//       bytesize: 100
+//       bytesizes: [100, 200, 500, 1000]
+//       pagesize: 10
+//       range: 10
+//       offset: 100
 //       assets: 5000
 //       nosetup: false
 //       consensus: false
-//     callback: benchmark/network-model/lib/get-asset.js
+//     callback: benchmark/network-model/lib/mixed-range-query-asset.js
 
-const helper = require('./helper');
 
-module.exports.info  = 'Get Asset of fixed size.';
+module.exports.info  = 'Paginated Range Querying Assets of mixed size.';
 
 const chaincodeID = 'fixed-asset';
-let clientIdx, assets, bytesize, consensus;
-let bc, contx;
+let clientIdx, pagesize, offset, range, consensus;
+let bc, contx, startKey, endKey;
 
 module.exports.init = async function(blockchain, context, args) {
     bc = blockchain;
@@ -39,9 +43,13 @@ module.exports.init = async function(blockchain, context, args) {
     context.contract = contract;
     contx = context;
 
-    assets = args.assets ? parseInt(args.assets) : 0;
+    offset = parseInt(args.offset);
+    range = parseInt(args.range);
+    pagesize = args.pagesize;
 
-    bytesize = args.bytesize;
+    startKey = 'client' + clientIdx + '_' + offset;
+    endKey = 'client' + clientIdx + '_' + (offset + range);
+
     consensus = args.consensus ? (args.consensus === 'true' || args.consensus === true): false;
     const nosetup = args.nosetup ? (args.nosetup === 'true' || args.nosetup === true) : false;
 
@@ -49,7 +57,7 @@ module.exports.init = async function(blockchain, context, args) {
         console.log('   -> Skipping asset creation stage');
     } else {
         console.log('   -> Entering asset creation stage');
-        await helper.addBatchAssets(contx, clientIdx, args);
+        await helper.addMixedBatchAssets(contx, clientIdx, args);
         console.log('   -> Test asset creation complete');
     }
 
@@ -58,9 +66,7 @@ module.exports.init = async function(blockchain, context, args) {
 
 module.exports.run = function() {
     // Create argument array [consensus(boolean), functionName(String), otherArgs(String)]
-    const uuid = Math.floor(Math.random() * Math.floor(assets));
-    const itemKey = 'client' + clientIdx + '_' + bytesize + '_' + uuid;
-    const myArgs = [consensus, 'getAsset', itemKey];
+    const myArgs = [consensus, 'paginatedRangeQuery', startKey, endKey, pagesize];
     return bc.queryState(contx, chaincodeID, 'v1', myArgs);
 };
 

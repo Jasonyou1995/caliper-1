@@ -1,57 +1,40 @@
 ---
 test:
-  name: fixed-asset-range-query-ramp-levelDB
+  name: fixed-asset-range-query-asset-ramp-levelDB
   description: This is a duration based benchmark targetting a Hyperledger Fabric network with a LevelDB world state database using the `fixed-asset` NodeJS chaincode contract that is interacted with via 
-    a Fabric-SDK-Node Gateway. Each test round flexes the 'paginateRangeQuery' method, and includes a null-operation to act as a performance baseline. Successive rounds create and query assets of larger bytesize.
+    a Fabric-SDK-Node Gateway. Each test round invokes the 'paginatedRangeQuery' method. Successive rounds create and query assets of larger bytesize.
   clients:
     type: local
     number: 4
   rounds:
-  - label: range-query-evaluate-0
-    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query that matches no items in the world state databse.
+  - label: range-query-evaluate-100
+    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 100 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
-      bytesize: 1000
-      range: 200
-      offset: 100
-      pagesize: '10'
-      nosetup: true
-      nomatch: true
-      consensus: false
-    callback: benchmark/network-model/lib/range-query-asset.js
-  - label: range-query-evaluate-500
-    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 500 bytes.
-    chaincodeId: fixed-asset
-    txDuration:
-    - 120
-    rateControl:
-    - type: fixed-backlog
-      opts:
-        unfinished_per_client: 30,
-    arguments:
-      create_sizes: [500,1000,2000,4000,8000,16000,32000]
-      bytesize: 500
-      range: 200
-      offset: 100
+      create_sizes: [100,1000,2000,4000,8000,16000,32000,64000]
       assets: 1000
-      pagesize: '10'
+      bytesize: 100
+      range: 200
+      offset: 100
+      pagesize: '10'      
+      nomatch: true
       consensus: false
     callback: benchmark/network-model/lib/range-query-asset.js
   - label: range-query-evaluate-1000
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 1000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       range: 200
@@ -64,11 +47,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 2000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 2000
       range: 200
@@ -81,11 +64,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 4000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 4000
       range: 200
@@ -98,11 +81,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 8000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 8000
       range: 200
@@ -115,11 +98,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 16000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 20,
+        unfinished_per_client: 15
     arguments:
       bytesize: 16000
       range: 200
@@ -132,13 +115,30 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 32000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 20,
+        unfinished_per_client: 15
     arguments:
       bytesize: 32000
+      range: 200
+      offset: 100
+      pagesize: '10'
+      nosetup: true
+      consensus: false
+    callback: benchmark/network-model/lib/range-query-asset.js
+  - label: range-query-evaluate-64000
+    description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 64000 bytes.
+    chaincodeId: fixed-asset
+    txDuration:
+    - 300
+    rateControl:
+    - type: fixed-backlog
+      opts:
+        unfinished_per_client: 15
+    arguments:
+      bytesize: 64000
       range: 200
       offset: 100
       pagesize: '10'

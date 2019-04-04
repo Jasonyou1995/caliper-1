@@ -7,39 +7,39 @@ test:
     type: local
     number: 4
   rounds:
-  - label: null-response-evaluate
+  - label: empty-contract-evaluate
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `nullResponse`, which immediately returns a null response. This represents the fastest possible round trip time for an evaluateTransaction() method.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       consensus: false
-    callback: benchmark/network-model/lib/null-response.js
-  - label: null-response-submit
+    callback: benchmark/network-model/lib/empty-contract.js
+  - label: empty-contract-submit
     description: Test a submitTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `nullResponse`, which immediately returns a null response. This represents the fastest possible round trip time for a submitTransaction() method.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       consensus: true
-    callback: benchmark/network-model/lib/null-response.js
+    callback: benchmark/network-model/lib/empty-contract.js
   - label: create-asset-1000
     description: Test a submitTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `create`, which inserts an Asset of size 1000 bytes into the World State database.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
     callback: benchmark/network-model/lib/create-asset.js
@@ -47,11 +47,11 @@ test:
     description: Test a evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `getAsset`. This method performs a `getState()` operation for a passed UUID, retrieving as asset of size 1000 bytes. 
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 15,
+        unfinished_per_client: 15
     arguments:
       nosetup: true
       bytesize: 1000
@@ -62,11 +62,11 @@ test:
     description: Test a submitTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `getAsset`. This method performs a `getState()` operation for a passed UUID, retrieving as asset of size 1000 bytes. This test includes involvement of the orderer, and appending to the ledger.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 15,
+        unfinished_per_client: 15
     arguments:
       nosetup: true
       bytesize: 1000
@@ -77,11 +77,11 @@ test:
     description: Test a evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query that matches no items in the world state databse.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       range: 200
@@ -95,11 +95,11 @@ test:
     description: Test an evaluateTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 1000 bytes.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       range: 200
@@ -112,11 +112,11 @@ test:
     description: Test a submitTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query that matches no items in the world state databse. This test includes involvement of the orderer, and appending to the ledger.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       range: 200
@@ -130,11 +130,11 @@ test:
     description: Test a submitTransaction() Gateway method against the NodeJS `fixed-asset` Smart Contract method named `paginatedRangeQuery`. This method performs a paginated range query, with a passed pagesize of 10 and a range keys that bound 200 assets created by the calling client. Each returned asset is of size 1000 bytes. This test includes involvement of the orderer, and appending to the ledger.
     chaincodeId: fixed-asset
     txDuration:
-    - 120
+    - 300
     rateControl:
     - type: fixed-backlog
       opts:
-        unfinished_per_client: 30,
+        unfinished_per_client: 15
     arguments:
       bytesize: 1000
       range: 200

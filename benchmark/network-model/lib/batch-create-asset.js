@@ -4,8 +4,8 @@
 
 'use strict';
 
-// Investigate submitTransaction() using network model to create an asset of specific size in the registry
-// - label: create-asset-100
+// Investigate submitTransaction() using network model to create a batch of assets of specific size in the registry
+// - label: batch-create-asset-1000
 //     chaincodeId: fixed-asset
 //     txNumber:
 //     - 1000
@@ -14,15 +14,13 @@
 //       opts:
 //         tps: 50
 //     arguments:
-//       bytesize: 100
-//     callback: benchmark/network-model/lib/create-asset.js
+//       bytesize: 1000
+//       batchsize: 100
+//     callback: benchmark/network-model/lib/batch-create-asset.js
 
-module.exports.info  = 'Creating Asset in Registry';
+module.exports.info  = 'Batch Creating Assets in Registry';
 
 const chaincodeID = 'fixed-asset';
-// const appmetrics = require('appmetrics');
-// require('appmetrics-dash').monitor({appmetrics: appmetrics});
-// appmetrics.enable('profiling');
 const bytes = (s) => {
     return ~-encodeURI(s).split(/%..|./).length;
 };
@@ -30,13 +28,15 @@ const bytes = (s) => {
 let txIndex = 0;
 let clientIdx;
 let asset = {docType: chaincodeID, content: ''};
-let bc, contx, bytesize;
+let bc, contx, bytesize, batchsize;
 
 module.exports.init = async function(blockchain, context, args) {
     bc = blockchain;
     contx = context;
     clientIdx = context.clientIdx;
-    bytesize = args.bytesize;
+
+    bytesize = args.bytesize ? parseInt(args.bytesize) : 100;
+    batchsize = args.batchsize ? parseInt(args.batchsize) : 1;
 
     asset.creator = 'client' + clientIdx;
     asset.bytesize = bytesize;
@@ -55,11 +55,18 @@ module.exports.init = async function(blockchain, context, args) {
 };
 
 module.exports.run = function() {
-    asset.uuid = 'client' + clientIdx + '_' + bytesize + '_' + txIndex;
-    txIndex++;
+
+    const batch = [];
+    for (let i=0; i<batchsize; i++) {
+        asset.uuid = 'client' + clientIdx + '_' + bytesize + '_' + txIndex;
+        const batchAsset = JSON.parse(JSON.stringify(asset));
+        batch.push(batchAsset);
+        txIndex++;
+    }
+
     const myArgs = {
-        verb: 'createAsset',
-        body: JSON.stringify(asset)
+        verb: 'createAssetsFromBatch',
+        body: JSON.stringify(batch)
     };
     return bc.invokeSmartContract(contx, chaincodeID, 'v1', myArgs);
 };

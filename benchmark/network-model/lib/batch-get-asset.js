@@ -5,9 +5,9 @@
 'use strict';
 
 
-// Investigate a 'get' that may or may not result in ledger appeding via orderer. Assets are created in the init phase
+// Investigate a batch 'get' that may or may not result in ledger appeding via orderer. Assets are created in the init phase
 // with a byte size that is specified as in input argument. The arguments "nosetup" and "consensus" are optional items that are default false.
-// - label: get-asset-100
+// - label: batch-get-asset-100
 //     chaincodeId: fixed-asset
 //     txNumber:
 //     - 1000
@@ -20,14 +20,15 @@
 //       assets: 5000
 //       nosetup: false
 //       consensus: false
+//       batchsize: 100
 //     callback: benchmark/network-model/lib/get-asset.js
 
 const helper = require('./helper');
 
-module.exports.info  = 'Get Asset of fixed size.';
+module.exports.info  = 'Batch Get Asset of fixed size.';
 
 const chaincodeID = 'fixed-asset';
-let clientIdx, assets, bytesize, consensus;
+let clientIdx, assets, bytesize, consensus, batchsize;
 let bc, contx;
 
 module.exports.init = async function(blockchain, context, args) {
@@ -40,6 +41,7 @@ module.exports.init = async function(blockchain, context, args) {
     contx = context;
 
     assets = args.assets ? parseInt(args.assets) : 0;
+    batchsize = args.batchsize ? parseInt(args.batchsize) : 1;
 
     bytesize = args.bytesize;
     consensus = args.consensus ? (args.consensus === 'true' || args.consensus === true): false;
@@ -58,9 +60,17 @@ module.exports.init = async function(blockchain, context, args) {
 
 module.exports.run = function() {
     // Create argument array [consensus(boolean), functionName(String), otherArgs(String)]
-    const uuid = Math.floor(Math.random() * Math.floor(assets));
-    const itemKey = 'client' + clientIdx + '_' + bytesize + '_' + uuid;
-    const myArgs = [consensus, 'getAsset', itemKey];
+    const uuids = [];
+    for (let i=0; i<batchsize; i++) {
+        // take a uuid in the range of known asset numbers
+        const uuid = Math.floor(Math.random() * Math.floor(assets));
+        const key = 'client' + clientIdx + '_' + bytesize + '_' + uuid;
+        uuids.push(key);
+    }
+
+    const batch = {};
+    batch.uuids = uuids;
+    const myArgs = [consensus, 'getAssetsFromBatch', JSON.stringify(batch)];
     return bc.queryState(contx, chaincodeID, 'v1', myArgs);
 };
 

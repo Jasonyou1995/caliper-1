@@ -2,13 +2,13 @@
   "caliper": {
     "blockchain": "fabric",
     "command" : {
-      "start": "docker-compose -f network/fabric-v1.4/2org1peercouchdb/docker-compose.yaml up -d;sleep 3s",
-      "end" : "docker-compose -f network/fabric-v1.4/2org1peercouchdb/docker-compose.yaml down;docker rm $(docker ps -aq);docker rmi $(docker images dev* -q)"
+      "start": "docker-compose -f network/fabric-v1.4/2org1peergoleveldb/docker-compose.yaml up -d;sleep 3s",
+      "end" : "docker-compose -f network/fabric-v1.4/2org1peergoleveldb/docker-compose.yaml down;docker rm $(docker ps -aq);docker rmi $(docker images dev* -q)"
     }
   },
   "fabric": {
     "cryptodir": "network/fabric-v1.4/config/crypto-config",
-    "ccp": "network/fabric-v1.4/2org1peercouchdb/ccp.json",
+    "ccp": "network/fabric-v1.4/2org1peergoleveldb/ccp-1of.json",
     "network": {
       "orderer": {
         "url": "grpc://localhost:7050",
@@ -85,13 +85,11 @@
           }
         }
       ],
-      "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}, {"signed-by": 2}]}
+      "policy": { "2-of": [{"signed-by": 0}, {"signed-by": 1}]}
     },
     "context": {
       "empty-contract-evaluate": "mychannel",
-      "empty-contract-evaluate-fixed-tps": "mychannel",
       "empty-contract-submit": "mychannel",
-      "empty-contract-submit-fixed-tps": "mychannel",
       "create-asset-100":  "mychannel",
       "create-asset-1000":  "mychannel",
       "create-asset-2000":  "mychannel",
@@ -100,14 +98,10 @@
       "create-asset-16000":  "mychannel",
       "create-asset-32000":  "mychannel",
       "create-asset-64000":  "mychannel",
-      "create-asset-8000-fixed-tps": "mychannel",
-      "create-asset-batch-1-8000": "mychannel",
       "create-asset-batch-10-8000": "mychannel",
       "create-asset-batch-20-8000": "mychannel",
-      "create-asset-batch-30-8000": "mychannel",
-      "create-asset-batch-40-8000": "mychannel",
       "create-asset-batch-50-8000": "mychannel",
-      "create-asset-batch-20-8000-fixed-tps": "mychannel",
+      "create-asset-batch-100-8000": "mychannel",
       "get-asset-submit-1000":  "mychannel",
       "get-asset-evaluate-0":  "mychannel",
       "get-asset-evaluate-100":  "mychannel",
@@ -118,14 +112,10 @@
       "get-asset-evaluate-16000":  "mychannel",
       "get-asset-evaluate-32000":  "mychannel",
       "get-asset-evaluate-64000":  "mychannel",
-      "get-asset-evaluate-8000-fixed-tps":  "mychannel",
-      "get-asset-batch-evaluate-1-8000": "mychannel",
       "get-asset-batch-evaluate-10-8000": "mychannel",
       "get-asset-batch-evaluate-20-8000": "mychannel",
-      "get-asset-batch-evaluate-30-8000": "mychannel",
-      "get-asset-batch-evaluate-40-8000": "mychannel",
       "get-asset-batch-evaluate-50-8000": "mychannel",
-      "get-asset-batch-evaluate-20-8000-fixed-tps": "mychannel",
+      "get-asset-batch-evaluate-100-8000": "mychannel",
       "range-query-submit-0": "mychannel",
       "range-query-submit-1000": "mychannel",
       "range-query-evaluate-0":  "mychannel",
@@ -140,37 +130,7 @@
       "range-query-evaluate-10-8000": "mychannel",
       "range-query-evaluate-20-8000": "mychannel",
       "range-query-evaluate-50-8000": "mychannel",
-      "range-query-evaluate-100-8000": "mychannel",
-      "mixed-range-query-evaluate-10": "mychannel",
-      "mixed-range-query-evaluate-20": "mychannel",
-      "mixed-range-query-evaluate-50": "mychannel",
-      "mixed-range-query-evaluate-100": "mychannel",
-      "mixed-range-query-evaluate-200": "mychannel",
-      "mixed-range-query-evaluate-500": "mychannel",
-      "mixed-range-query-evaluate-1000": "mychannel",
-      "mixed-range-query-evaluate-20-fixed-tps": "mychannel",
-      "rich-query-submit-0": "mychannel",
-      "rich-query-submit-1000": "mychannel",
-      "rich-query-evaluate-0": "mychannel",
-      "rich-query-evaluate-100": "mychannel",
-      "rich-query-evaluate-1000": "mychannel",
-      "rich-query-evaluate-2000": "mychannel",
-      "rich-query-evaluate-4000": "mychannel",
-      "rich-query-evaluate-8000": "mychannel",
-      "rich-query-evaluate-16000": "mychannel",
-      "rich-query-evaluate-32000": "mychannel",
-      "rich-query-evaluate-64000": "mychannel",
-      "rich-query-evaluate-10-8000": "mychannel",
-      "rich-query-evaluate-20-8000": "mychannel",
-      "rich-query-evaluate-15-8000": "mychannel",
-      "rich-query-evaluate-100-8000": "mychannel",
-      "mixed-rich-query-evaluate-10": "mychannel",
-      "mixed-rich-query-evaluate-20": "mychannel",
-      "mixed-rich-query-evaluate-50": "mychannel",
-      "mixed-rich-query-evaluate-100": "mychannel",
-      "mixed-rich-query-evaluate-200": "mychannel",
-      "mixed-rich-query-evaluate-500": "mychannel",
-      "mixed-rich-query-evaluate-1000": "mychannel"
+      "range-query-evaluate-100-8000": "mychannel"
     }
   },
   "info" : {

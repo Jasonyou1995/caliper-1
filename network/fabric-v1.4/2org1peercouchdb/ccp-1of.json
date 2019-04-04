@@ -35,7 +35,7 @@
 			"eventSource":true
 		  },
 		  "peer0.org2.example.com":{
-			"endorsingPeer":true,
+			"endorsingPeer":false,
 			"chaincodeQuery":false,
 			"ledgerQuery":true,
 			"eventSource":false

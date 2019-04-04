@@ -4,6 +4,7 @@
 
 'use strict';
 
+const helper = require('./helper');
 
 // Investigate a paginated range query that may or may not result in ledger appeding via orderer. Assets are created in the init phase
 // with a byte size that is specified as in input argument. Pagesize and the number of existing test assets, as well as the range and offset, are also cofigurable. The arguments
@@ -29,13 +30,8 @@
 
 module.exports.info  = 'Paginated Range Querying Assets of fixed size.';
 
-const bytes = (s) => {
-    return ~-encodeURI(s).split(/%..|./).length;
-};
-
 const chaincodeID = 'fixed-asset';
-let clientIdx, testAssetNum, pagesize, offset, range, consensus;
-let asset = {docType: chaincodeID, content: ''};
+let clientIdx, pagesize, offset, range, consensus;
 let bc, contx, bytesize, nomatch, startKey, endKey;
 
 module.exports.init = async function(blockchain, context, args) {
@@ -52,7 +48,6 @@ module.exports.init = async function(blockchain, context, args) {
     pagesize = args.pagesize;
     bytesize = args.bytesize;
 
-    testAssetNum = args.nomatch ? parseInt(args.assets) : 0;
     nomatch = args.nomatch ?  (args.nomatch === 'true' || args.nomatch === true): false;
     startKey = nomatch ? 'client_nomatch_' + offset : 'client' + clientIdx + '_' + bytesize + '_' + offset;
     endKey = nomatch ? 'client_nomatch_' + (offset + range) : 'client' + clientIdx + '_' + bytesize + '_' + (offset + range);
@@ -60,35 +55,11 @@ module.exports.init = async function(blockchain, context, args) {
     consensus = args.consensus ? (args.consensus === 'true' || args.consensus === true): false;
     const nosetup = args.nosetup ? (args.nosetup === 'true' || args.nosetup === true) : false;
 
-    if (nosetup || testAssetNum === 0) {
+    if (nosetup) {
         console.log('   -> Skipping asset creation stage');
     } else {
-        console.log('   -> Creating assets of size: ', args.create_sizes);
-        for (let index in args.create_sizes) {
-            const size = args.create_sizes[index];
-            console.log('   -> Creating asset set of size: ', size);
-            const uuidBase = 'client' + clientIdx + '_' + size + '_';
-
-            // define the asset to be created in this loop
-            asset.bytesize = size;
-            asset.creator = 'client' + clientIdx;
-            asset.uuid = uuidBase;
-
-            // Complete the asset definition
-            const rand = 'random';
-            let idx = 0;
-            while (bytes(JSON.stringify(asset)) < size) {
-                const letter = rand.charAt(idx);
-                idx = idx >= rand.length ? 0 : idx+1;
-                asset.content = asset.content + letter;
-            }
-
-            // Create assets loop
-            for (let i=0; i<testAssetNum; i++) {
-                asset.uuid = uuidBase + i;
-                await context.contract.submitTransaction('createAsset', JSON.stringify(asset));
-            }
-        }
+        console.log('   -> Entering asset creation stage');
+        await helper.addBatchAssets(contx, clientIdx, args);
         console.log('   -> Test asset creation complete');
     }
 
