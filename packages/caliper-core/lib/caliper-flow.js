@@ -42,6 +42,65 @@ module.exports.run = async function(absConfigFile, absNetworkFile, admin, client
     let successes = 0;
     let failures = 0;
 
+    // High level flow specifications from user
+    let flowFlags = 0;
+    let performStart;
+    let performInit;
+    let performInstall;
+    let performTest;
+    let performEnd;
+    if (Config.get(Config.keys.Flow.StartOnly, false)) {
+        logger.info('Flow flag detected, will only execute start scripts');
+        performStart = true;
+        performInit = false;
+        performInstall = false;
+        performTest = false;
+        performEnd = false;
+        flowFlags++;
+    } else if (Config.get(Config.keys.Flow.InitOnly, false)) {
+        logger.info('Flow flag detected, will only perform init phase');
+        performStart = false;
+        performInit = true;
+        performInstall = false;
+        performTest = false;
+        performEnd = false;
+        flowFlags++;
+    } else if (Config.get(Config.keys.Flow.InstallOnly, false)) {
+        logger.info('Flow flag detected, will only perform smart contract install phase');
+        performStart = false;
+        performInit = false;
+        performInstall = true;
+        performTest = false;
+        performEnd = false;
+        flowFlags++;
+    } else if (Config.get(Config.keys.Flow.TestOnly, false)) {
+        logger.info('Flow flag detected, will only perform test phase');
+        performStart = false;
+        performInit = false;
+        performInstall = false;
+        performTest = true;
+        performEnd = false;
+        flowFlags++;
+    } else if (Config.get(Config.keys.Flow.EndOnly, false)) {
+        logger.info('Flow flag detected, will only execute end scripts');
+        performStart = false;
+        performInit = false;
+        performInstall = false;
+        performTest = false;
+        performEnd = true;
+        flowFlags++;
+    } else {
+        performStart = true;
+        performInit = true;
+        performInstall = true;
+        performTest = true;
+        performEnd = true;
+    }
+
+    if (flowFlags > 1) {
+        throw new Error('Multiple benchmark flow parameters specified, only one of [flow-init-only, flow-install-only, flow-test-only] may be specified at a time');
+    }
+
     logger.info('####### Caliper Test #######');
     const adminClient = new Blockchain(admin);
     const clientOrchestrator  = new ClientOrchestrator(absConfigFile);
@@ -53,14 +112,10 @@ module.exports.run = async function(absConfigFile, absNetworkFile, admin, client
     let configObject = CaliperUtils.parseYaml(absConfigFile);
     let networkObject = CaliperUtils.parseYaml(absNetworkFile);
 
-    let skipStart = Config.get(Config.keys.SkipStartScript, false);
-    let skipEnd = Config.get(Config.keys.SkipEndScript, false);
-
     try {
-
         // Conditional running of 'start' commands
-        if (skipStart || (configObject.flow && configObject.flow.skipStart))  {
-            logger.info('Skipping start commands due to passed flag');
+        if (!performStart)  {
+            logger.info('Skipping start commands due to benchmark flow conditioning');
         } else {
             if (networkObject.hasOwnProperty('caliper') && networkObject.caliper.hasOwnProperty('command') && networkObject.caliper.command.hasOwnProperty('start')) {
                 if (!networkObject.caliper.command.start.trim()) {
@@ -73,61 +128,72 @@ module.exports.run = async function(absConfigFile, absNetworkFile, admin, client
         }
 
         // Conditional network initialisation
-        if (configObject.flow && configObject.flow.skipInit) {
-            logger.info('Skipping network initialisation due to test config flag');
+        if (!performInit) {
+            logger.info('Skipping initialization phase due to benchmark flow conditioning');
         } else {
             await adminClient.init();
         }
 
         // Conditional smart contract installation
-        if (configObject.flow && configObject.flow.skipInstall) {
-            logger.info('Skipping smart contract installation due to test config flag');
+        if (!performInstall) {
+            logger.info('Skipping install smart contract phase due to benchmark flow conditioning');
         } else {
             await adminClient.installSmartContract();
         }
 
-        // Start the monitors
-        try {
-            await monitor.start();
-            logger.info('Started monitor successfully');
-        } catch (err) {
-            logger.error('Could not start monitor, ' + (err.stack ? err.stack : err));
+        // Conditional test phase
+        if (!performTest) {
+            logger.info('Skipping benchmark test phase due to benchmark flow conditioning');
+        } else {
+            // Start the monitors
+            try {
+                await monitor.start();
+                logger.info('Started monitor successfully');
+            } catch (err) {
+                logger.error('Could not start monitor, ' + (err.stack ? err.stack : err));
+            }
+
+            let testIdx = 0;
+            let numberOfClients = await clientOrchestrator.init();
+            let clientArgs = await adminClient.prepareClients(numberOfClients);
+
+            const tester = new Test(clientArgs, absNetworkFile, clientOrchestrator, clientFactory, workspace, report, demo, monitor);
+            const allTests = configObject.test.rounds;
+            for (let test of allTests) {
+                ++testIdx;
+                const response = await tester.runTestRounds(test, (testIdx === allTests.length));
+                successes += response.successes;
+                failures += response.failures;
+            }
+
+            logger.info('---------- Finished Test ----------\n');
+            report.printResultsByRound();
+            monitor.printMaxStats();
+            await monitor.stop();
+
+            const date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
+            const outFile = path.join(process.cwd(), `report-${date}.html`);
+            await report.finalize(outFile);
+
+            clientOrchestrator.stop();
+
+            demo.stopWatch();
+
+            // NOTE: keep the below multi-line formatting intact, otherwise the indents will interfere with the template literal
+            let testSummary = `# Test summary: ${successes} succeeded, ${failures} failed #`;
+            logger.info(`
+
+${'#'.repeat(testSummary.length)}
+${testSummary}
+${'#'.repeat(testSummary.length)}
+`);
         }
-
-        let testIdx = 0;
-        let numberOfClients = await clientOrchestrator.init();
-        let clientArgs = await adminClient.prepareClients(numberOfClients);
-
-        const tester = new Test(clientArgs, absNetworkFile, clientOrchestrator, clientFactory, workspace, report, demo, monitor);
-        const allTests = configObject.test.rounds;
-        for (let test of allTests) {
-            ++testIdx;
-            const response = await tester.runTestRounds(test, (testIdx === allTests.length));
-            successes += response.successes;
-            failures += response.failures;
-        }
-
-        logger.info('---------- Finished Test ----------\n');
-        report.printResultsByRound();
-        monitor.printMaxStats();
-        await monitor.stop();
-
-        const date = new Date().toISOString().replace(/-/g,'').replace(/:/g,'').substr(0,15);
-        const outFile = path.join(process.cwd(), `report-${date}.html`);
-        await report.finalize(outFile);
-
-        clientOrchestrator.stop();
-
     } catch (err) {
         logger.error(`Error: ${err.stack ? err.stack : err}`);
         errorStatus = 1;
     } finally {
-        demo.stopWatch();
-
         // Conditional running of 'end' commands
-        if (skipEnd || (configObject.flow && configObject.flow.skipEnd)) {
-            logger.info('Skipping end commands due to passed flag');
-        } else {
+        if (performEnd) {
             if (networkObject.hasOwnProperty('caliper') && networkObject.caliper.hasOwnProperty('command') && networkObject.caliper.command.hasOwnProperty('end')) {
                 if (!networkObject.caliper.command.end.trim()) {
                     logger.error('End command is specified but it is empty');
@@ -136,16 +202,9 @@ module.exports.run = async function(absConfigFile, absNetworkFile, admin, client
                     await CaliperUtils.execAsync(cmd);
                 }
             }
+        } else {
+            logger.info('Skipping end commands due to benchmark flow conditioning');
         }
-
-        // NOTE: keep the below multi-line formatting intact, otherwise the indents will interfere with the template literal
-        let testSummary = `# Test summary: ${successes} succeeded, ${failures} failed #`;
-        logger.info(`
-
-${'#'.repeat(testSummary.length)}
-${testSummary}
-${'#'.repeat(testSummary.length)}
-`);
     }
 
     return errorStatus;

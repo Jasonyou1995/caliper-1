@@ -59,9 +59,14 @@ const keys = {
     ZooAddress: 'caliper-zooaddress',
     ZooConfig: 'caliper-zooconfig',
     TxUpdateTime: 'caliper-txupdatetime',
-    SkipStartScript: 'caliper-skipstartscript',
-    SkipEndScript: 'caliper-skipendscript',
     Logging: 'caliper-logging',
+    Flow: {
+        StartOnly: 'start-only',
+        InitOnly: 'init-only',
+        InstallOnly: 'install-only',
+        TestOnly: 'test-only',
+        EndOnly: 'end-only'
+    },
     Fabric: {
         SleepAfter: {
             CreateChannel: 'caliper-fabric-sleepafter-createchannel',
