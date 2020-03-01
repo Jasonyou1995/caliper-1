@@ -32,72 +32,94 @@ Copyright (c) 2020 Jason You
   usage of GUI when integrated with Caliper CLI.
 */
 
-/*
-  Return random float number between given min (inclusive) and max (exclusive)
-*/
-function getRandomNumber(min, max) {
-  let value = Math.random() * (max - min) + min;
-  value = Math.round(value * 100) / 100;
-  return value;
-}
 
-/*
-  Get random int between min and max with size at least 'size'
-*/
-function getRandomInt(min, max, size) {
-  let value = Math.floor(Math.random() * (max - min) + min)
-  value = value + '';
-  while (value.length < size) value = '0' + value;
-  return value;
-}
 
-module.exports.dataConstructor = function Data() {
-  let timeStamp = new Date().getTime();
-  let timeString = new Date().toISOString();
+class Data {
+  #timeStamp;
+  #timeString;
 
-  /* Transaction throughput data */
-  this.txThroughput = {
-    type: 'txThroughput',
-    value: getRandomInt(3000, 5000, 4),
-    time: timeString,
-    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
-  };
+  constructor() {
+    this.#timeStamp = new Date().getTime();
+    this.#timeString = new Date().toISOString();
 
-  /* Transaction latency data */
-  this.txLatency = {
-    type: 'txLatency',
-    value: getRandomNumber(5, 50),
-    time: timeString,
-    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
-  };
+    /* Transaction throughput data */
+    this.txThroughput = {
+      type: 'txThroughput',
+      value: this.getRandomInt(3000, 5000, 4),
+      time: this.#timeString,
+      id: `txThroughput_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`,
+    };
 
-  /* Read throughput data */
-  this.readThroughput = {
-    type: 'readThroughput',
-    value: getRandomInt(5000, 6000, 4),
-    time: timeString,
-    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
-  };
+    /* Transaction latency data */
+    this.txLatency = {
+      type: 'txLatency',
+      value: this.getRandomNumber(5, 50),
+      time: this.#timeString,
+      id: `txLatency_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`,
+    };
 
-  /* Read latency data */
-  this.readLatency = {
-    type: 'readLatency',
-    value: getRandomNumber(1, 30),
-    time: timeString,
-    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
-  };
+    /* Read throughput data */
+    this.readThroughput = {
+      type: 'readThroughput',
+      value: this.getRandomInt(5000, 6000, 4),
+      time: this.#timeString,
+      id: `readThroughput_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`,
+    };
+
+    /* Read latency data */
+    this.readLatency = {
+      type: 'readLatency',
+      value: this.getRandomNumber(1, 30),
+      time: this.#timeString,
+      id: `readLatency_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`,
+    };
+  }
+
 
   // refresh the data in this instance with new random values
-  this.refresh = () => {
-    console.log("[+] Refreshing data...");
+  refresh() {
+    // updating the new timestamp
+    this.#timeStamp = new Date().getTime();
+    this.#timeString = new Date().toISOString();
 
-    // // updating the new timestamp
-    // timeStamp = new Date().getTime();
-    // timeString = new Date().toISOString();
-    //
-    // // updating the stored data
-    // this.txThroughput
+    // updating the stored data
+    this.txThroughput.value = this.getRandomInt(3000, 5000, 4);
+    this.txThroughput.time = this.#timeString,
+    this.txThroughput.id = `txThroughput_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`;
 
-    console.log("[+] ... finished!")
+    this.txLatency.value = this.getRandomNumber(5, 50);
+    this.txLatency.time = this.#timeString,
+    this.txLatency.id = `txLatency_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`;
+
+    this.readThroughput.value = this.getRandomInt(5000, 6000, 4);
+    this.readThroughput.time = this.#timeString,
+    this.readThroughput.id = `readThroughput_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`;
+
+    this.readLatency.value = this.getRandomNumber(1, 30);
+    this.readLatency.time = this.#timeString,
+    this.readLatency.id = `readLatency_${this.#timeStamp}_${this.getRandomInt(0, 9999, 4)}`;
+
+    console.log("[+] Data refresh finished!")
+  }
+
+  /*
+    Return random float number between given min (inclusive) and max (exclusive)
+  */
+  getRandomNumber(min, max) {
+    let value = Math.random() * (max - min) + min;
+    value = Math.round(value * 100) / 100;
+    return value;
+  }
+
+  /*
+    Get random int between min and max with size at least 'size'
+  */
+  getRandomInt(min, max, size) {
+    let value = Math.floor(Math.random() * (max - min) + min)
+    value = value + '';
+    while (value.length < size) value = '0' + value;
+    return value;
   }
 }
+
+module.exports = Data;

@@ -13,7 +13,7 @@
 */
 /*
  * Author:               Jason You
- * Last modified date:   Sep 1 2019
+ * Last modified date:   March 1, 2019
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,24 +29,29 @@
  */
 /*jshint esversion: 6 */
 
-let express = require('express');
+// NOTE: currently using apiV2 for function demo purpose, in the future when
+// Caliper-CLI has stable release, we will connect the GUI with it
+
+const express = require('express');
+const app = express();
 const PORT = 3001;
-let apiV1 = require('./src/api/api1.js');
-// var apiV2 = require("./src/api/api2.js");
-let app = express();
+const API_VERSION = "V2";
+// const api = require('./src/api/api1.js');    // apiV1
+const api = require('./src/api/api2.js');  // apiV2
 const cors = require('cors');
 
+// Using API middleware
+app.use('/', api);
+
+// Using CORS middleware
 app.use(cors());
-// For data posting
-app.use(express.urlencoded({
-    extended: true
-}));
+
+// For URL encoded data transfering POST and PUT
+app.use(express.urlencoded({extended: true}));
+
+// For JSON data transfering POST and PUT
 app.use(express.json());
 
-
-app.use('/v1', apiV1);
-// app.use("/v2", apiV2);
-
 app.listen(PORT, function() {
-    console.log(`Caliper-API started on port ${PORT}`);
+    console.log(`Caliper-API started on port ${PORT} with localhost`);
 });

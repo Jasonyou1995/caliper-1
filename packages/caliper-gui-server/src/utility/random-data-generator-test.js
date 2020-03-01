@@ -13,7 +13,7 @@
 */
 /*
  * Author:               Jason You
- * Last modified date:   Feb 28 2020
+ * Last modified date:   March 1 2020
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,15 +29,9 @@
  */
 /*jshint esversion: 6 */
 
-let dataConstructor = require('../src/utility/random-data-generator.js').dataConstructor;
-
-let data = new dataConstructor();
+let Data = require('./random-data-generator.js');
+let data = new Data();
 
 console.log(data);
-
 data.refresh();
-
 console.log(data);
-
-// data.refresh();
-// console.log(`data: ${data}`);
