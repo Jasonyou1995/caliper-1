@@ -50,10 +50,6 @@ lerna-debug.log
 # Ignore data
 data/
 
-<<<<<<< HEAD
-# Ignore temp test files
-=======
 # Ignore test and temp files in GUI server
->>>>>>> gui server upgrade
 test/
 temp/

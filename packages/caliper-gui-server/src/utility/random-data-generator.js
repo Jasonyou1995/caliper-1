@@ -36,53 +36,67 @@ Copyright (c) 2020 Jason You
   Return random float number between given min (inclusive) and max (exclusive)
 */
 function getRandomNumber(min, max) {
-  return Math.random() * (max - min) + min;
+  let value = Math.random() * (max - min) + min;
+  value = Math.round(value * 100) / 100;
+  return value;
+}
+
+/*
+  Get random int between min and max with size at least 'size'
+*/
+function getRandomInt(min, max, size) {
+  let value = Math.floor(Math.random() * (max - min) + min)
+  value = value + '';
+  while (value.length < size) value = '0' + value;
+  return value;
 }
 
 module.exports.dataConstructor = function Data() {
+  let timeStamp = new Date().getTime();
+  let timeString = new Date().toISOString();
+
   /* Transaction throughput data */
   this.txThroughput = {
-    timestamps: [],
-    datasets: {
-      data1: [],
-      data2: [],
-      data3: []
-    }
+    type: 'txThroughput',
+    value: getRandomInt(3000, 5000, 4),
+    time: timeString,
+    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
   };
 
   /* Transaction latency data */
   this.txLatency = {
-    timestamps: [],
-    datasets: {
-      data1: [],
-      data2: [],
-      data3: []
-    }
+    type: 'txLatency',
+    value: getRandomNumber(5, 50),
+    time: timeString,
+    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
   };
 
   /* Read throughput data */
-  this.txThroughput = {
-    timestamps: [],
-    datasets: {
-      data1: [],
-      data2: [],
-      data3: []
-    }
+  this.readThroughput = {
+    type: 'readThroughput',
+    value: getRandomInt(5000, 6000, 4),
+    time: timeString,
+    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
   };
 
   /* Read latency data */
   this.readLatency = {
-    timestamps: [],
-    datasets: {
-      data1: [],
-      data2: [],
-      data3: []
-    }
+    type: 'readLatency',
+    value: getRandomNumber(1, 30),
+    time: timeString,
+    id: `txThroughput_${timeStamp}_${getRandomInt(0, 9999, 4)}`,
   };
 
   // refresh the data in this instance with new random values
   this.refresh = () => {
     console.log("[+] Refreshing data...");
+
+    // // updating the new timestamp
+    // timeStamp = new Date().getTime();
+    // timeString = new Date().toISOString();
+    //
+    // // updating the stored data
+    // this.txThroughput
 
     console.log("[+] ... finished!")
   }
